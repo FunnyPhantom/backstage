@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { removeRequiredConstraint } from './formatters';
+import { standardJsonSchemaReplacer } from './formatters';
 
 describe('removeRequiredConstraint', () => {
   // provided to function match function signature.
@@ -25,11 +25,15 @@ describe('removeRequiredConstraint', () => {
     const booleanValue = true;
     const stringValue = 'foo';
 
-    expect(removeRequiredConstraint(sampleKey, numberValue)).toBe(numberValue);
-    expect(removeRequiredConstraint(sampleKey, booleanValue)).toBe(
+    expect(standardJsonSchemaReplacer(sampleKey, numberValue)).toBe(
+      numberValue,
+    );
+    expect(standardJsonSchemaReplacer(sampleKey, booleanValue)).toBe(
       booleanValue,
     );
-    expect(removeRequiredConstraint(sampleKey, stringValue)).toBe(stringValue);
+    expect(standardJsonSchemaReplacer(sampleKey, stringValue)).toBe(
+      stringValue,
+    );
   });
 
   it('The object stays intact if it does not have `type` field.', () => {
@@ -41,7 +45,7 @@ describe('removeRequiredConstraint', () => {
       },
     };
 
-    expect(removeRequiredConstraint(sampleKey, sampleObj)).toEqual(sampleObj);
+    expect(standardJsonSchemaReplacer(sampleKey, sampleObj)).toEqual(sampleObj);
   });
 
   it('The object should be the same if there is field named `type` with value `object` but no `required` field', () => {
@@ -62,7 +66,9 @@ describe('removeRequiredConstraint', () => {
       },
     };
 
-    expect(removeRequiredConstraint(sampleKey, jsonSchema)).toEqual(jsonSchema);
+    expect(standardJsonSchemaReplacer(sampleKey, jsonSchema)).toEqual(
+      jsonSchema,
+    );
   });
 
   it('The object should not have required field after being passed to replacer', () => {
@@ -72,12 +78,10 @@ describe('removeRequiredConstraint', () => {
       properties: {
         baseUrl: {
           type: 'string',
-          visibility: 'frontend',
           description: 'The public absolute root URL that the frontend.',
         },
         title: {
           type: 'string',
-          visibility: 'frontend',
           description:
             'The title of the app, as shown in the Backstage web interface.',
         },
@@ -88,25 +92,45 @@ describe('removeRequiredConstraint', () => {
       properties: {
         baseUrl: {
           type: 'string',
-          visibility: 'frontend',
           description: 'The public absolute root URL that the frontend.',
         },
         title: {
           type: 'string',
-          visibility: 'frontend',
           description:
             'The title of the app, as shown in the Backstage web interface.',
         },
       },
     };
 
-    expect(removeRequiredConstraint(sampleKey, jsonSchemaWithRequired)).toEqual(
-      jsonSchemaWithoutRequiredField,
+    expect(
+      standardJsonSchemaReplacer(sampleKey, jsonSchemaWithRequired),
+    ).toEqual(jsonSchemaWithoutRequiredField);
+  });
+
+  it('The value should be undefined if the key is visibility or deepVisibility', () => {
+    const someValue = 42;
+    const visibilityKey = 'visibility';
+    const deepVisibilityKey = 'deepVisibility';
+
+    expect(standardJsonSchemaReplacer(visibilityKey, someValue)).toBe(
+      undefined,
+    );
+    expect(standardJsonSchemaReplacer(deepVisibilityKey, someValue)).toBe(
+      undefined,
     );
   });
 
-  it('In usage with JSON.stringify, it should remove all the required fields from the schema', () => {
-    const jsonSchemaWithRequired = {
+  it('For $schema field, it will output the jsonv7 schema', () => {
+    const schemaValue = 'https://backstage.io/schema/config-v1';
+    const schemaKey = '$schema';
+
+    expect(standardJsonSchemaReplacer(schemaKey, schemaValue)).toBe(
+      'http://json-schema.org/draft-07/schema#',
+    );
+  });
+
+  it('In usage with JSON.stringify, it should remove all the required, visibility, and deepVisibility fields from the schema', () => {
+    const spotifyConfigSchema = {
       $schema: 'https://backstage.io/schema/config-v1',
       title: 'Application Configuration Schema',
       type: 'object',
@@ -125,6 +149,7 @@ describe('removeRequiredConstraint', () => {
         'This is the schema describing the structure of the app-config.yaml configuration file.',
       properties: {
         app: {
+          deepVisibility: 'frontend',
           type: 'object',
           required: ['baseUrl'],
           description: 'Generic frontend configuration.',
@@ -171,8 +196,8 @@ describe('removeRequiredConstraint', () => {
         },
       },
     };
-    const jsonSchemaWithoutRequiredField = {
-      $schema: 'https://backstage.io/schema/config-v1',
+    const jsonSchemaV7ConfigSchema = {
+      $schema: 'http://json-schema.org/draft-07/schema#',
       title: 'Application Configuration Schema',
       type: 'object',
       description:
@@ -184,12 +209,10 @@ describe('removeRequiredConstraint', () => {
           properties: {
             baseUrl: {
               type: 'string',
-              visibility: 'frontend',
               description: 'The public absolute root URL that the frontend.',
             },
             title: {
               type: 'string',
-              visibility: 'frontend',
               description:
                 'The title of the app, as shown in the Backstage web interface.',
             },
@@ -199,22 +222,18 @@ describe('removeRequiredConstraint', () => {
               properties: {
                 env: {
                   type: 'string',
-                  visibility: 'frontend',
                   description: 'Environment for Datadog RUM events',
                 },
                 clientToken: {
                   type: 'string',
-                  visibility: 'frontend',
                   description: 'clientToken for Datadog RUM events',
                 },
                 applicationId: {
                   type: 'string',
-                  visibility: 'frontend',
                   description: 'applicationId for Datadog RUM events',
                 },
                 site: {
                   type: 'string',
-                  visibility: 'frontend',
                   description: 'site for Datadog RUM events',
                 },
               },
@@ -226,8 +245,8 @@ describe('removeRequiredConstraint', () => {
 
     expect(
       JSON.parse(
-        JSON.stringify(jsonSchemaWithRequired, removeRequiredConstraint),
+        JSON.stringify(spotifyConfigSchema, standardJsonSchemaReplacer),
       ),
-    ).toEqual(jsonSchemaWithoutRequiredField);
+    ).toEqual(jsonSchemaV7ConfigSchema);
   });
 });

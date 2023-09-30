@@ -1,11 +1,12 @@
 - A MR to spotify backstage repo
 - <strike>Add the extension</strike>
 - <strike>Add the script that will create the latest schema but without required field. (For vscode Intellisense.)</strike>
-  - Improvement (Not in scope): Make this automatic.
+  - FOR LATER: <strike> Improvement (Not in scope): Make this automatic.
     - Base automation: create PR for jsonSchema website.
     - If there is a versioning process defined whenever extensions gets updated or the docs get updated, use that to create the PR automatically.
-      - Or run the script, and only go to create PR whenever there is a difference between config schema of before and current. (Before can be fetched directly)
-- Make a PR to jsonSchemaStore to put app-config.yaml in schema store.
+    - Or run the script, and only go to create PR whenever there is a difference between config schema of before and current. (Before can be fetched directly) </strike>
+- <strike>Make a PR to jsonSchemaStore to put app-config.yaml in schema store.</strike>
+  - Note: Although the script was able to do most of the job, but still some elements needed change. For example the for schema type, array can't be accepted, and need to be changed to anyOf or allOf. => Need either updating the schemas of the plugins not to provide an array as type of the property, or some sort of parser that auto fixes these scenarios if possible. (Not in scope)
 - In extension contributes, in the association field, associate app-config.local.yaml and app-config.production.yaml with that as well.
 - In extension dependencies, include `redhat.vscode-yaml` as a dependency to make sure it's installed and available.
 - make a setting in the extension that will either show static intellisense. (The json schema store) OR by dynamic intellisense it will update the workspace setting of the user to make the dynamic association.

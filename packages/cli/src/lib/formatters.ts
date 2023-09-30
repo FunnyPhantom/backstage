@@ -15,8 +15,23 @@
  */
 
 // The any is the signature of the replacer function for JSON.stringify's second argument.
-//
-export const removeRequiredConstraint = (_: any, value: any): any => {
+
+/**
+ * This function will make the json serialized version of the schema adhere to jsonSchemaV7 standard
+ * in order to be published at [Schema Store](https://www.schemastore.org/json/)
+ * @param key the key of the field
+ * @param value value of the field being serialized
+ * @returns undefined if the value should not be present. Returns the rest of the serializable object.
+ */
+export const standardJsonSchemaReplacer = (key: any, value: any): any => {
+  if (key === 'visibility' || key === 'deepVisibility') {
+    return undefined;
+  }
+
+  if (key === '$schema') {
+    return 'http://json-schema.org/draft-07/schema#';
+  }
+
   if (
     typeof value === 'object' &&
     value.type === 'object' &&
@@ -24,5 +39,6 @@ export const removeRequiredConstraint = (_: any, value: any): any => {
   ) {
     delete value.required;
   }
+
   return value;
 };

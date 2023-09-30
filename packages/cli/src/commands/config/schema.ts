@@ -20,7 +20,7 @@ import { stringify as stringifyYaml } from 'yaml';
 import { loadCliConfig } from '../../lib/config';
 import { JsonObject } from '@backstage/types';
 import { mergeConfigSchemas } from '@backstage/config-loader';
-import { removeRequiredConstraint } from '../../lib/formatters';
+import { standardJsonSchemaReplacer } from '../../lib/formatters';
 
 export default async (opts: OptionValues) => {
   const { schema } = await loadCliConfig({
@@ -29,9 +29,9 @@ export default async (opts: OptionValues) => {
     mockEnv: true,
   });
 
-  let replacer: typeof removeRequiredConstraint | undefined = undefined;
-  if (!opts.requiredField) {
-    replacer = removeRequiredConstraint;
+  let replacer: typeof standardJsonSchemaReplacer | undefined = undefined;
+  if (opts.prepareSchemastore) {
+    replacer = standardJsonSchemaReplacer;
   }
 
   let configSchema: JsonObject | JSONSchema;

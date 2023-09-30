@@ -371,8 +371,8 @@ export function registerCommands(program: Command) {
     .option('--merge', 'Print the config schemas merged', true)
     .option('--no-merge', 'Print the config schemas not merged')
     .option(
-      '--no-required-field',
-      'Removes required field from the schema. (Used for vscode IntelliSense)',
+      '--prepare-schemastore',
+      'Generate a JsonSchema V7 compliant schema. (Used for vscode IntelliSense)',
     )
     .description('Print configuration schema')
     .action(lazy(() => import('./config/schema').then(m => m.default)));
