@@ -1,0 +1,18 @@
+- A MR to spotify backstage repo
+- Add the extension
+- Add the script that will create the latest schema but without required field. (For vscode Intellisense.)
+  - Improvement (Not in scope): Make this automatic.
+    - Base automation: create PR for jsonSchema website.
+    - If there is a versioning process defined whenever extensions gets updated or the docs get updated, use that to create the PR automatically.
+      - Or run the script, and only go to create PR whenever there is a difference between config schema of before and current. (Before can be fetched directly)
+- Make a PR to jsonSchemaStore to put app-config.yaml in schema store.
+- In extension contributes, in the association field, associate app-config.local.yaml and app-config.production.yaml with that as well.
+- In extension dependencies, include `redhat.vscode-yaml` as a dependency to make sure it's installed and available.
+- make a setting in the extension that will either show static intellisense. (The json schema store) OR by dynamic intellisense it will update the workspace setting of the user to make the dynamic association.
+- The dynamic association:
+  - it will have a watcher on packages/app/package.json, and
+  - whenever new packages are are added, it will run the `npx backstage-cli config:schema --json --strip-required` and gets the output.
+    - `--strip-required is the flag that will generate the schema without required field.` (Line 3)
+  - it will save the output in the extension available storage for that workspace (context.storageUri) in a file named app-config.schema.json.
+  - it will update the "yaml.schemas" in the workspace setting and make an association between app-config\*.json, and that json schema file.
+- convert unit tests to jest
