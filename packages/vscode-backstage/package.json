@@ -17,8 +17,17 @@
         "command": "vscode-backstage.helloWorld",
         "title": "Hello World"
       }
+    ],
+    "yamlValidation": [
+      {
+        "fileMatch": "app-config*{.yaml,.yml}",
+        "url": "https://json.schemastore.org/app-config.json"
+      }
     ]
   },
+  "extensionDependencies": [
+    "redhat.vscode-yaml"
+  ],
   "scripts": {
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
