@@ -1,6 +1,6 @@
 - A MR to spotify backstage repo
-- Add the extension
-- Add the script that will create the latest schema but without required field. (For vscode Intellisense.)
+- <strike>Add the extension</strike>
+- <strike>Add the script that will create the latest schema but without required field. (For vscode Intellisense.)</strike>
   - Improvement (Not in scope): Make this automatic.
     - Base automation: create PR for jsonSchema website.
     - If there is a versioning process defined whenever extensions gets updated or the docs get updated, use that to create the PR automatically.
