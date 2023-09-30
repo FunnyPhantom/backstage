@@ -23,3 +23,9 @@ Some things to consider:
 1. how to detect plugin change
 1. how "scan the project"
 1. how to do this in a workspace environment.
+
+#### sync with backstage
+
+1. create another branch from master
+1. sync with fork
+1. rebase master on top of that branch
